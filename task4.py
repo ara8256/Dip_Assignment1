@@ -21,7 +21,31 @@ threshold = threshold_otsu(gray_img)
 img_otsu = gray_img < threshold
 #applying mask
 filtered = filter_image(img2, img_otsu)
-#displaying the final image
-cv2.imshow("Img",filtered)
+
+#saving the semgmented image
+cv2.imwrite('segmented_coins.png',filtered)
+
+# Load the segmented image 
+segmented_image = cv2.imread('segmented_coins.png', cv2.IMREAD_GRAYSCALE)
+
+# Check if the image was loaded successfully
+if segmented_image is None:
+    print("Error: Could not load the image.")
+else:
+    # Find contours in the segmented image
+    contours, _ = cv2.findContours(segmented_image, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    coin_count = 0
+
+    # Loop through the detected contours
+    for contour in contours:
+        # Check if the contour is large enough to be considered a coin
+        if cv2.contourArea(contour) > 100: 
+            coin_count += 1
+
+# Display the segmented image with contours 
+cv2.imshow('Segmented Image', segmented_image)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
+
+# Print the number of coins detected
+print(f'Number of coins: {coin_count}')
